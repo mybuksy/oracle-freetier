@@ -67,16 +67,5 @@ jobs:
           echo "=== OCI ENV ==="
           cat oracle-freetier-instance-creation-main/oci.env
 
-      - name: Debug main.py env reading
-        run: |
-          cd oracle-freetier-instance-creation-main
-          python3 -c "
-from dotenv import dotenv_values
-config = dotenv_values('oci.env')
-print('OCI_USER_ID:', config.get('OCI_USER_ID'))
-print('OCI_CONFIG:', config.get('OCI_CONFIG'))
-print('OCI_SUBNET_ID:', config.get('OCI_SUBNET_ID'))
-"
-
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
