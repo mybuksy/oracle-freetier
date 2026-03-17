@@ -60,12 +60,7 @@ jobs:
           echo "EMAIL_PASSWORD=" >> oracle-freetier-instance-creation-main/oci.env
           echo "DISCORD_WEBHOOK=" >> oracle-freetier-instance-creation-main/oci.env
 
-      - name: Debug config
-        run: |
-          echo "=== OCI CONFIG ==="
-          cat ~/.oci/config
-          echo "=== OCI ENV ==="
-          cat oracle-freetier-instance-creation-main/oci.env
-
       - name: Run script
-        run: python oracle-freetier-instance-creation-main/main.py
+        run: |
+          cd oracle-freetier-instance-creation-main
+          python main.py
