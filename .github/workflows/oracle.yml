@@ -51,10 +51,12 @@ jobs:
           echo "SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub" >> oracle-freetier-instance-creation-main/oci.env
           echo "OCI_SUBNET_ID=${{ secrets.OCI_SUBNET_ID }}" >> oracle-freetier-instance-creation-main/oci.env
           echo "OCI_IMAGE_ID=" >> oracle-freetier-instance-creation-main/oci.env
-          echo "OPERATING_SYSTEM=Canonical Ubuntu" >> oracle-freetier-instance-creation-main/oci.env
+          echo 'OPERATING_SYSTEM="Canonical Ubuntu"' >> oracle-freetier-instance-creation-main/oci.env
           echo "OS_VERSION=22.04" >> oracle-freetier-instance-creation-main/oci.env
           echo "ASSIGN_PUBLIC_IP=false" >> oracle-freetier-instance-creation-main/oci.env
           echo "BOOT_VOLUME_SIZE=50" >> oracle-freetier-instance-creation-main/oci.env
+          echo "OCPUS=4" >> oracle-freetier-instance-creation-main/oci.env
+          echo "MEMORY_IN_GBS=24" >> oracle-freetier-instance-creation-main/oci.env
           echo "NOTIFY_EMAIL=False" >> oracle-freetier-instance-creation-main/oci.env
           echo "EMAIL=abc@gmail.com" >> oracle-freetier-instance-creation-main/oci.env
           echo "EMAIL_PASSWORD=" >> oracle-freetier-instance-creation-main/oci.env
