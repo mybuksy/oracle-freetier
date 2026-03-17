@@ -25,14 +25,8 @@ jobs:
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/id_rsa.pub
-          cat > ~/.oci/config << EOF
-          [DEFAULT]
-          user=${{ secrets.OCI_USER_OCID }}
-          fingerprint=${{ secrets.OCI_FINGERPRINT }}
-          tenancy=${{ secrets.OCI_TENANCY_OCID }}
-          region=${{ secrets.OCI_REGION }}
-          key_file=/home/runner/.oci/oci_api_key.pem
-          EOF
+          printf "[DEFAULT]\nuser=${{ secrets.OCI_USER_OCID }}\nfingerprint=${{ secrets.OCI_FINGERPRINT }}\ntenancy=${{ secrets.OCI_TENANCY_OCID }}\nregion=${{ secrets.OCI_REGION }}\nkey_file=/home/runner/.oci/oci_api_key.pem\n" > ~/.oci/config
+          cat ~/.oci/config
 
       - name: Update oci.env
         run: |
