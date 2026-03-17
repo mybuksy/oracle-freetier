@@ -10,49 +10,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          
+
       - name: Install dependencies
         run: pip install -r oracle-freetier-instance-creation-main/requirements.txt
-        
+
       - name: Create OCI config and SSH key
         run: |
           mkdir -p ~/.oci
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/id_rsa.pub
-          echo "[DEFAULT]" > ~/.oci/config
-          echo "user=${{ secrets.OCI_USER_OCID }}" >> ~/.oci/config
-          echo "fingerprint=${{ secrets.OCI_FINGERPRINT }}" >> ~/.oci/config
-          echo "tenancy=${{ secrets.OCI_TENANCY_OCID }}" >> ~/.oci/config
-          echo "region=${{ secrets.OCI_REGION }}" >> ~/.oci/config
-          echo "key_file=/home/runner/.oci/oci_api_key.pem" >> ~/.oci/config
+          cat > ~/.oci/config << EOF
+[DEFAULT]
+user=${{ secrets.OCI_USER_OCID }}
+fingerprint=${{ secrets.OCI_FINGERPRINT }}
+tenancy=${{ secrets.OCI_TENANCY_OCID }}
+region=${{ secrets.OCI_REGION }}
+key_file=/home/runner/.oci/oci_api_key.pem
+EOF
 
       - name: Update oci.env
         run: |
-          cat > oracle-freetier-instance-creation-main/oci.env << 'EOF'
-          OCI_CONFIG=/home/runner/.oci/config
-          OCT_FREE_AD=AD-1
-          DISPLAY_NAME=my-arm-ubuntu-instance
-          OCI_COMPUTE_SHAPE=VM.Standard.A1.Flex
-          SECOND_MICRO_INSTANCE=False
-          REQUEST_WAIT_TIME_SECS=60
-          SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub
-          OCI_SUBNET_ID=
-          OCI_IMAGE_ID=
-          OPERATING_SYSTEM=Canonical Ubuntu
-          OS_VERSION=22.04
-          ASSIGN_PUBLIC_IP=false
-          BOOT_VOLUME_SIZE=50
-          NOTIFY_EMAIL=False
-          EMAIL=abc@gmail.com
-          EMAIL_PASSWORD=
-          DISCORD_WEBHOOK=
-          EOF
+          cat > oracle-freetier-instance-creation-main/oci.env << EOF
+OCI_CONFIG=/home/runner/.oci/config
+OCI_USER_ID=${{ secrets.OCI_USER_OCID }}
+OCT_FREE_AD=AD-1
+DISPLAY_NAME=my-arm-ubuntu-instance
+OCI_COMPUTE_SHAPE=VM.Standard.A1.Flex
+SECOND_MICRO_INSTANCE=False
+REQUEST_WAIT_TIME_SECS=60
+SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub
+OCI_SUBNET_ID=${{ secrets.OCI_SUBNET_ID }}
+OCI_IMAGE_ID=
+OPERATING_SYSTEM=Canonical Ubuntu
+OS_VERSION=22.04
+ASSIGN_PUBLIC_IP=false
+BOOT_VOLUME_SIZE=50
+NOTIFY_EMAIL=False
+EMAIL=abc@gmail.com
+EMAIL_PASSWORD=
+DISCORD_WEBHOOK=
+EOF
 
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
