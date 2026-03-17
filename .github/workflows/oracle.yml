@@ -42,6 +42,7 @@ jobs:
       - name: Update oci.env
         run: |
           echo "OCI_CONFIG=/home/runner/.oci/config" > oracle-freetier-instance-creation-main/oci.env
+          echo "OCI_USER_ID=${{ secrets.OCI_USER_OCID }}" >> oracle-freetier-instance-creation-main/oci.env
           echo "OCT_FREE_AD=AD-1" >> oracle-freetier-instance-creation-main/oci.env
           echo "DISPLAY_NAME=my-arm-ubuntu-instance" >> oracle-freetier-instance-creation-main/oci.env
           echo "OCI_COMPUTE_SHAPE=VM.Standard.A1.Flex" >> oracle-freetier-instance-creation-main/oci.env
@@ -58,6 +59,13 @@ jobs:
           echo "EMAIL=abc@gmail.com" >> oracle-freetier-instance-creation-main/oci.env
           echo "EMAIL_PASSWORD=" >> oracle-freetier-instance-creation-main/oci.env
           echo "DISCORD_WEBHOOK=" >> oracle-freetier-instance-creation-main/oci.env
+
+      - name: Debug config
+        run: |
+          echo "=== OCI CONFIG ==="
+          cat ~/.oci/config
+          echo "=== OCI ENV ==="
+          cat oracle-freetier-instance-creation-main/oci.env
 
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
