@@ -31,12 +31,28 @@ jobs:
           echo "tenancy=${{ secrets.OCI_TENANCY_OCID }}" >> ~/.oci/config
           echo "region=${{ secrets.OCI_REGION }}" >> ~/.oci/config
           echo "key_file=/home/runner/.oci/oci_api_key.pem" >> ~/.oci/config
-          cat ~/.oci/config
 
       - name: Update oci.env
         run: |
-          sed -i "s|OCI_CONFIG=.*|OCI_CONFIG=/home/runner/.oci/config|" oracle-freetier-instance-creation-main/oci.env
-          sed -i "s|SSH_AUTHORIZED_KEYS_FILE=.*|SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub|" oracle-freetier-instance-creation-main/oci.env
+          cat > oracle-freetier-instance-creation-main/oci.env << 'EOF'
+          OCI_CONFIG=/home/runner/.oci/config
+          OCT_FREE_AD=AD-1
+          DISPLAY_NAME=my-arm-ubuntu-instance
+          OCI_COMPUTE_SHAPE=VM.Standard.A1.Flex
+          SECOND_MICRO_INSTANCE=False
+          REQUEST_WAIT_TIME_SECS=60
+          SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub
+          OCI_SUBNET_ID=
+          OCI_IMAGE_ID=
+          OPERATING_SYSTEM=Canonical Ubuntu
+          OS_VERSION=22.04
+          ASSIGN_PUBLIC_IP=false
+          BOOT_VOLUME_SIZE=50
+          NOTIFY_EMAIL=False
+          EMAIL=abc@gmail.com
+          EMAIL_PASSWORD=
+          DISCORD_WEBHOOK=
+          EOF
 
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
