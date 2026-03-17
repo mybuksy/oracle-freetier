@@ -8,6 +8,12 @@ on:
 jobs:
   create-instance:
     runs-on: ubuntu-latest
+    env:
+      OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+      OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+      OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_REGION: ${{ secrets.OCI_REGION }}
+      OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
     steps:
       - uses: actions/checkout@v3
 
@@ -25,37 +31,13 @@ jobs:
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/id_rsa.pub
-          cat > ~/.oci/config << EOF
-[DEFAULT]
-user=${{ secrets.OCI_USER_OCID }}
-fingerprint=${{ secrets.OCI_FINGERPRINT }}
-tenancy=${{ secrets.OCI_TENANCY_OCID }}
-region=${{ secrets.OCI_REGION }}
-key_file=/home/runner/.oci/oci_api_key.pem
-EOF
+          printf "[DEFAULT]\nuser=%s\nfingerprint=%s\ntenancy=%s\nregion=%s\nkey_file=/home/runner/.oci/oci_api_key.pem\n" \
+            "$OCI_USER_OCID" "$OCI_FINGERPRINT" "$OCI_TENANCY_OCID" "$OCI_REGION" > ~/.oci/config
 
       - name: Update oci.env
         run: |
-          cat > oracle-freetier-instance-creation-main/oci.env << EOF
-OCI_CONFIG=/home/runner/.oci/config
-OCI_USER_ID=${{ secrets.OCI_USER_OCID }}
-OCT_FREE_AD=AD-1
-DISPLAY_NAME=my-arm-ubuntu-instance
-OCI_COMPUTE_SHAPE=VM.Standard.A1.Flex
-SECOND_MICRO_INSTANCE=False
-REQUEST_WAIT_TIME_SECS=60
-SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub
-OCI_SUBNET_ID=${{ secrets.OCI_SUBNET_ID }}
-OCI_IMAGE_ID=
-OPERATING_SYSTEM=Canonical Ubuntu
-OS_VERSION=22.04
-ASSIGN_PUBLIC_IP=false
-BOOT_VOLUME_SIZE=50
-NOTIFY_EMAIL=False
-EMAIL=abc@gmail.com
-EMAIL_PASSWORD=
-DISCORD_WEBHOOK=
-EOF
+          printf "OCI_CONFIG=/home/runner/.oci/config\nOCI_USER_ID=%s\nOCT_FREE_AD=AD-1\nDISPLAY_NAME=my-arm-ubuntu-instance\nOCI_COMPUTE_SHAPE=VM.Standard.A1.Flex\nSECOND_MICRO_INSTANCE=False\nREQUEST_WAIT_TIME_SECS=60\nSSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub\nOCI_SUBNET_ID=%s\nOCI_IMAGE_ID=\nOPERATING_SYSTEM=Canonical Ubuntu\nOS_VERSION=22.04\nASSIGN_PUBLIC_IP=false\nBOOT_VOLUME_SIZE=50\nNOTIFY_EMAIL=False\nEMAIL=abc@gmail.com\nEMAIL_PASSWORD=\nDISCORD_WEBHOOK=\n" \
+            "$OCI_USER_OCID" "$OCI_SUBNET_ID" > oracle-freetier-instance-creation-main/oci.env
 
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
