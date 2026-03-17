@@ -19,21 +19,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r oracle-freetier-instance-creation-main/requirements.txt
         
-      - name: Create OCI config
+      - name: Create OCI config and SSH key
         run: |
           mkdir -p ~/.oci
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/id_rsa.pub
           cat > ~/.oci/config << EOF
           [DEFAULT]
           user=${{ secrets.OCI_USER_OCID }}
           fingerprint=${{ secrets.OCI_FINGERPRINT }}
           tenancy=${{ secrets.OCI_TENANCY_OCID }}
           region=${{ secrets.OCI_REGION }}
-          key_file=~/.oci/oci_api_key.pem
+          key_file=/home/runner/.oci/oci_api_key.pem
           EOF
-          
+
+      - name: Update oci.env
+        run: |
+          sed -i "s|OCI_CONFIG=.*|OCI_CONFIG=/home/runner/.oci/config|" oracle-freetier-instance-creation-main/oci.env
+          sed -i "s|SSH_AUTHORIZED_KEYS_FILE=.*|SSH_AUTHORIZED_KEYS_FILE=/home/runner/id_rsa.pub|" oracle-freetier-instance-creation-main/oci.env
+
       - name: Run script
         run: python oracle-freetier-instance-creation-main/main.py
-        env:
-          OCI_CONFIG_FILE: ~/.oci/config
