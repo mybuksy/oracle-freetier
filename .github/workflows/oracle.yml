@@ -1,4 +1,4 @@
-name: Oracle Instance Creator
+name: Oracle Instance Creator2
 
 on:
   schedule:
